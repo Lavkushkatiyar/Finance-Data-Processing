@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "jest": "^30.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^7.6.0"
+  },
+  "name": "finance-data-processing",
+  "version": "1.0.0",
+  "description": "Finance Data Processing and Access Control Backend\r Objective\r To evaluate your backend development skills through a practical assignment centered around API design, data modeling, business logic, and access control.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lavkushkatiyar/Finance-Data-Processing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Lavkushkatiyar/Finance-Data-Processing/issues"
+  },
+  "homepage": "https://github.com/Lavkushkatiyar/Finance-Data-Processing#readme"
+}
