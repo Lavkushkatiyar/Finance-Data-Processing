@@ -1,12 +1,16 @@
 require("dotenv").config();
 const express = require("express");
 const authenticate = require("./middleware/authenticate");
+
 const {
   registerHandler,
   loginHandler,
 } = require("./controllers/auth_controller");
 
 const { seedAdmin } = require("./utils");
+
+const authorizeRoles = require("./middleware/authorize_Roles");
+const ROLES = require("./constant");
 
 const app = express();
 const port = 3000;
@@ -37,6 +41,41 @@ router.get("/test", authenticate, (req, res) => {
 })
 
 app.use(router);
+
+
+
+
+router.get(
+  "/admin-only",
+  authenticate,
+  authorizeRoles([ROLES.ADMIN]),
+  (req, res) => {
+    res.json({ message: "only admin can access ! lets see hahahdhahahaha" })
+  }
+)
+
+router.get(
+  "/analytics",
+  authenticate,
+  authorizeRoles([ROLES.ADMIN, ROLES.ANALYST]),
+  (req, res) => {
+    res.json({ message: "anlaytics data" })
+  }
+)
+
+
+router.get(
+  "/records",
+  authenticate,
+  authorizeRoles([
+    ROLES.ADMIN,
+    ROLES.ANALYST,
+    ROLES.VIEWER
+  ]),
+  (req, res) => {
+    res.json({ message: "theree can access" })
+  }
+)
 
 seedAdmin().then(() => {
   console.log("Admin seeded");
