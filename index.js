@@ -4,6 +4,9 @@ const port = 3000;
 
 app.use(express.json());
 
+app.use(express.)
+
+
 
 app.get("/", (req, res) => {
     res.send("apps start");
@@ -14,7 +17,7 @@ app.post("/", (req, res) => {
     console.log(req.body)
 
     res.json(req.body);
-    
+
 });
 
 app.listen(port, () => {
