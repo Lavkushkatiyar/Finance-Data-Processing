@@ -19,7 +19,7 @@ const addNewUser = async (name, email, password) => {
     });
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
+const passwordHash = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
     data: {
@@ -30,7 +30,6 @@ const addNewUser = async (name, email, password) => {
     },
     include: { role: true },
   });
-
   return user;
 };
 

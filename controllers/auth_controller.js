@@ -15,9 +15,13 @@ const registerHandler = async (req, res) => {
 
   try {
     const user = await addNewUser(body.name, body.email, body.password);
-    return res.json({ id: user.id, msg: "user created" });
-  } catch {
-    return res.status(400).json({ error: "user already exists" });
+    return res.status(201).json({ id: user.id, msg: "user created" });
+  } catch (error) {
+    console.error("Registration error:", error.message);
+    if (error.message === "user exists") {
+      return res.status(409).json({ error: "User already exists" });
+    }
+    return res.status(500).json({ error: "Internal server error during registration" });
   }
 };
 
@@ -35,17 +39,22 @@ const loginHandler = async (req, res) => {
     });
   }
 
-  const { email, password } = body;
-  const user = await isValidUser(email, password);
+  try {
+    const { email, password } = body;
+    const user = await isValidUser(email, password);
 
-  if (!user) {
-    return res.status(401).json({
-      error: "invalid credentials",
-    });
+    if (!user) {
+      return res.status(401).json({
+        error: "invalid credentials",
+      });
+    }
+
+    const token = getToken(user);
+    return res.json({ token });
+  } catch (error) {
+    console.error("Login error:", error.message);
+    return res.status(500).json({ error: "Internal server error during login" });
   }
-
-  const token = getToken(user);
-  return res.json({ token });
 };
 
 module.exports = {
