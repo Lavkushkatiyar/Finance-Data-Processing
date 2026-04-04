@@ -5,7 +5,6 @@ const ROLES = require("../constant");
 
 const router = express.Router();
 
-// Protected General Routes
 router.use(authenticate);
 
 router.get("/test", (req, res) => {

@@ -9,6 +9,6 @@ const router = express.Router();
 router.use("/auth", authRoutes);
 router.use("/user", userRoutes);
 router.use("/api", apiRoutes);
-router.use("/records", recordRoutes);
+router.use("/record", recordRoutes);
 
 module.exports = router;
