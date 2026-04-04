@@ -1,12 +1,19 @@
 const { prisma } = require("../utils.js")
 
 const createRecordService = async (userId, data) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+
+  if(!user) throw new Error("User not found")
+
+  const isValid = user.role === "ADMIN" || user.role === "ANALYST"
+
+  if (!isValid) throw new Error("Not allowed to create this record")
+
   const { amount, type, categoryId, date, notes } = data
 
   if (!amount || amount <= 0) throw new Error("Invalid amount")
 
   if (!["INCOME", "EXPENSE"].includes(type)) throw new Error("Invalid type")
-
 
   if (!categoryId) throw new Error("categoryId is required")
 
@@ -32,10 +39,13 @@ const createRecordService = async (userId, data) => {
 
 const getRecordsService = async (user, query) => {
   const { type, categoryId, from, to } = query
-
+  
   const filters = {}
+  if (user.role !== "ADMIN")  filters.userId = user.id
 
-  if (type) filters.type = type
+  if (type && ["INCOME", "EXPENSE"].includes(type)) {
+    filters.type = type
+  }
 
   if (categoryId) filters.categoryId = categoryId
 
@@ -90,7 +100,7 @@ const deleteRecordService = async(recordId,user)=> {
     where :{id:recordId}
   })
   if(!existing) throw new Error("doesn't exist record")
-    const isOwner = existing.userId = user.id;
+    const isOwner = existing.userId === user.id;
   const isAdmin = user.role ==="ADMIN";
 
   if(!isOwner && !isAdmin) throw new Error("Not allowed to delete this record")

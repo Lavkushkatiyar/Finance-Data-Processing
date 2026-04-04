@@ -9,7 +9,7 @@ const router = express.Router()
 router.post(
   "/create",
   authenticate,
-  authorizeRoles([ROLES.ADMIN]),
+  authorizeRoles([ROLES.ADMIN,ROLES.ANALYST]),
   createRecordController
 )
 
