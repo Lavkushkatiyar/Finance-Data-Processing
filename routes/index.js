@@ -1,0 +1,14 @@
+const express = require("express");
+const authRoutes = require("./auth.routes");
+const userRoutes = require("./user.routes");
+const apiRoutes = require("./api.routes");
+const recordRoutes = require("./record.routes");
+
+const router = express.Router();
+
+router.use("/auth", authRoutes);
+router.use("/user", userRoutes);
+router.use("/api", apiRoutes);
+router.use("/records", recordRoutes);
+
+module.exports = router;
