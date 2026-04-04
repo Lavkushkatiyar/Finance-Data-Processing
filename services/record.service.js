@@ -58,5 +58,46 @@ const getRecordsService = async (user, query) => {
   return records
 }
 
+const updateRecordService = async (recordId, user, data) => {
+  const existing = await prisma.financialRecord.findUnique({
+    where: { id: recordId }
+  })
 
-module.exports = { createRecordService, getRecordsService }
+  if (!existing) throw new Error("Record not found")
+
+  const isOwner = existing.userId === user.id
+  const isAdmin = user.role === "ADMIN"
+
+  if (!isOwner && !isAdmin) {
+    throw new Error("Not allowed to update this record")
+  }
+
+  const updated = await prisma.financialRecord.update({
+    where: { id: recordId },
+    data: {
+      amount: data.amount ?? existing.amount,
+      type: data.type ?? existing.type,
+      categoryId: data.categoryId ?? existing.categoryId,
+      date: data.date ? new Date(data.date) : existing.date,
+      notes: data.notes ?? existing.notes
+    }
+  })
+
+  return updated
+}
+const deleteRecordService = async(recordId,user)=> {
+  const existing =  await prisma.financialRecord.findUnique({
+    where :{id:recordId}
+  })
+  if(!existing) throw new Error("doesn't exist record")
+    const isOwner = existing.userId = user.id;
+  const isAdmin = user.role ==="ADMIN";
+
+  if(!isOwner && !isAdmin) throw new Error("Not allowed to delete this record")
+
+    await prisma.financialRecord.delete({
+      where :{id:recordId}
+    })
+ 
+}
+module.exports = { createRecordService, getRecordsService ,updateRecordService ,deleteRecordService}

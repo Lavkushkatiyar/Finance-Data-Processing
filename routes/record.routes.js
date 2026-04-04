@@ -2,9 +2,9 @@ const express = require("express")
 const authenticate = require("../middleware/authenticate")
 const authorizeRoles = require("../middleware/authorize_Roles")
 const ROLES = require("../constant")
-const {createRecordController,getRecordsController} = require("../controllers/record.controller")
+const {createRecordController,getRecordsController, updateRecordController,deleteRecordController} = require("../controllers/record.controller")
 
-const router = express.Router()
+const router = express.Router() 
 
 router.post(
   "/create",
@@ -12,11 +12,25 @@ router.post(
   authorizeRoles([ROLES.ADMIN]),
   createRecordController
 )
+
 router.get(
   "/get",
   authenticate,
   authorizeRoles([ROLES.ADMIN, ROLES.ANALYST, ROLES.VIEWER]),
   getRecordsController
 )
+router.patch(
+  "/:id",
+  authenticate,
+  authorizeRoles([ROLES.ADMIN, ROLES.ANALYST]),
+  updateRecordController
+)
+router.delete(
+  "/:id",
+  authenticate,
+  authorizeRoles([ROLES.ADMIN, ROLES.ANALYST]),
+  deleteRecordController
+)
+
 
 module.exports = router
