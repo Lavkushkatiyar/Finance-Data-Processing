@@ -12,6 +12,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Category {
+  id   String     @id @default(uuid())
+  name String
+  type RecordType
+
+  records FinancialRecord[]
+}
+
+model FinancialRecord {
+  id     String     @id @default(uuid())
+  amount Float
+  type   RecordType
+  date   DateTime
+  notes  String?
+
+  userId     String
+  categoryId String
+
+  User     User     @relation(fields: [userId], references: [id])
+  Category Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RecordType {
+  INCOME
+  EXPENSE
+}
+
 model Role {
   id          String  @id @default(uuid())
   name        String  @unique
@@ -29,8 +59,9 @@ model User {
   status       UserStatus @default(ACTIVE)
   role         Role       @relation("UserRoleRelation", fields: [roleId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  records   FinancialRecord[]
 }
 
 enum UserStatus {
