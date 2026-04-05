@@ -2,6 +2,14 @@ const express = require("express");
 const authenticate = require("../middleware/authenticate");
 const authorizeRoles = require("../middleware/authorize_Roles");
 const ROLES = require("../constant");
+
+const { validate, validateParams } = require("../middleware/validate");
+
+const {
+  createUserSchema,
+  userIdParamSchema,
+} = require("../validators/admin.schema");
+
 const {
   createUserController,
   getUserController,
@@ -14,18 +22,22 @@ router.post(
   "/user",
   authenticate,
   authorizeRoles([ROLES.ADMIN]),
+  validate(createUserSchema),
   createUserController,
 );
+
 router.get(
   "/user",
   authenticate,
   authorizeRoles([ROLES.ADMIN]),
   getUserController,
 );
+
 router.delete(
   "/user/:id",
   authenticate,
   authorizeRoles([ROLES.ADMIN]),
+  validateParams(userIdParamSchema),
   deleteUserController,
 );
 
