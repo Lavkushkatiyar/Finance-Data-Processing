@@ -1,4 +1,5 @@
-const { getToken, isValidUser, addNewUser } = require("../utils");
+const { getToken } = require("../utils/jwt");
+const { isValidUser, addNewUser } = require("../services/auth.service");
 
 const registerHandler = async (req, res) => {
   const { name, email, password } = req.validatedBody;

@@ -1,6 +1,6 @@
 require("dotenv").config();
 const app = require("./app");
-const { seedAdmin } = require("./utils");
+const { seedAdmin } = require("./db/seed");
 
 const port = process.env.PORT || 3000;
 

@@ -1,4 +1,4 @@
-const { prisma } = require("../utils.js");
+const prisma = require("../db/prisma");
 
 const createRecordService = async (userId, data) => {
   const { amount, type, categoryId, date, notes } = data;

@@ -3,7 +3,7 @@ const {
   deleteUserService,
   updateUserStatusService,
 } = require("../services/adminService");
-const { addNewUser } = require("../utils");
+const { addNewUser } = require("../services/auth.service");
 
 const createUserController = async (req, res) => {
   const { name, email, password, role } = req.validatedBody;

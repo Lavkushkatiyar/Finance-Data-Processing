@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../db/prisma");
 
 const createCategoryService = async (data) => {
   const category = await prisma.category.create({
