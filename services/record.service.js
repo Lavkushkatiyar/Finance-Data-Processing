@@ -68,6 +68,7 @@ const getRecordsService = async (user, query) => {
   return records
 }
 
+
 const updateRecordService = async (recordId, user, data) => {
   const existing = await prisma.financialRecord.findUnique({
     where: { id: recordId }
@@ -82,6 +83,7 @@ const updateRecordService = async (recordId, user, data) => {
     throw new Error("Not allowed to update this record")
   }
 
+
   const updated = await prisma.financialRecord.update({
     where: { id: recordId },
     data: {
@@ -95,6 +97,8 @@ const updateRecordService = async (recordId, user, data) => {
 
   return updated
 }
+
+
 const deleteRecordService = async(recordId,user)=> {
   const existing =  await prisma.financialRecord.findUnique({
     where :{id:recordId}
@@ -110,4 +114,5 @@ const deleteRecordService = async(recordId,user)=> {
     })
  
 }
+
 module.exports = { createRecordService, getRecordsService ,updateRecordService ,deleteRecordService}

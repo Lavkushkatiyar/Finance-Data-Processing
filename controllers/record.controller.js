@@ -17,7 +17,6 @@ const createRecordController = async (req, res) => {
 }
 
 const getRecordsController = async (req, res) => {
-  console.log(req.query)
   try {
     const userId = req.user.id
     const query = req.query
