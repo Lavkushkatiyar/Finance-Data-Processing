@@ -1,141 +1,172 @@
-Finance Data Processing and Access Control Backend
-Objective
-To evaluate your backend development skills through a practical assignment centered around API design, data modeling, business logic, and access control.
+# Finance Data Processing - Backend Architecture
 
-This assignment is intended to assess how you think about backend architecture, structure application logic, handle data correctly, and build reliable systems that are clear, maintainable, and logically organized.
+A robust, logically structured RESTful API configured to operate as a finance dashboard system backend. This application is capable of user role management, category administration, financial record tracking, and dashboard analytics computing.
 
-Note: If you have already built a similar backend project earlier, you may submit that project for evaluation. Please make sure to clearly explain how it matches this assignment and share the repository and, if available, the deployed API or documentation link.
-Key Instructions
-You are not required to follow a fixed project structure. You are free to organize the backend in the way you believe is most appropriate.
-Focus on correctness, clarity, and maintainability. We are interested in how you design data flow, structure APIs, and write backend logic.
-Reasonable assumptions are acceptable. If something is not explicitly defined, you may make sensible assumptions and document them.
-Clean implementation matters. A smaller but well designed solution is better than a large but inconsistent one.
-Flexibility
-You have full freedom to:
+---
 
-Use any backend language, framework, or library
-Use any database of your choice, or even an in memory store for a simplified implementation
-Define your own schema, service structure, and business logic flow
-Build REST APIs, GraphQL APIs, or an equivalent backend interface
-Use mock authentication and local development setup if needed
-Scenario
-Imagine you are building the backend for a finance dashboard system where different users interact with financial records based on their role.
+## Table of Contents
 
-The system should support the storage and management of financial entries, user roles, permissions, and summary level analytics. The goal is to build a backend that is logically structured and able to serve data to a frontend dashboard in a clean and efficient way.
+1. [Project Overview](#project-overview)
+2. [Database Schema & ERD Mapping](#database-schema--erd-mapping)
+3. [System Architecture](#system-architecture)
+4. [API Endpoints Overview](#api-endpoints-overview)
+5. [Security & Authentication](#security--authentication)
+6. [Local Environment Setup](#local-environment-setup)
+7. [Design Decisions & Trade-offs](#design-decisions--trade-offs)
 
-Core Requirements
+---
 
-1. User and Role Management
-   Provide a way to manage users and their access levels within the system.
+## Project Overview
 
-Your backend should support:
+The objective of this application is to serve a high-performance backend processing unit. Users interact with different financial objects and view analytics depending on their explicitly defined hierarchical `Role`.
 
-Creating and managing users
-Assigning roles to users
-Managing user status such as active or inactive
-Restricting actions based on roles
-You may define roles such as:
+It utilizes standard data modeling to represent `Users`, map them cleanly against independent `Roles`, and cascade ownership over categorized `Financial Records`.
 
-Viewer: Can only view dashboard data
-Analyst: Can view records and access insights
-Admin: Can create, update, and manage records and users
-The exact role model is up to you, but role based behavior should be clear in your implementation.
+---
 
-2. Financial Records Management
-   Create backend support for financial data such as transactions or entries.
+## Database Schema & ERD Mapping
 
-Each record can include fields such as:
+The underlying Database layer is mapped securely to **PostgreSQL** driven entirely by the **Prisma ORM**. The structure employs scalable one-to-many and many-to-one foreign key constraints smoothly.
 
-Amount
-Type such as income or expense
-Category
-Date
-Notes or description
-Your backend should support operations such as:
+### 1. `User` Model
 
-Creating records
-Viewing records
-Updating records
-Deleting records
-Filtering records based on criteria such as date, category, or type 3. Dashboard Summary APIs
-Provide APIs or backend logic that can return summary level data for a dashboard.
+Represents instances of authenticated engineers or consumers inside the app.
 
-Examples include:
+- `id`: UUID (Primary Key)
+- `name`: String
+- `email`: String (Unique)
+- `passwordHash`: String (Secure BCrypt Hash)
+- `status`: Enum (`ACTIVE` | `INACTIVE`) - Defaults to `ACTIVE`
+- `roleId`: Foreign Key linking to `Role`
+- _Timestamps_: `createdAt`, `updatedAt`
 
-Total income
-Total expenses
-Net balance
-Category wise totals
-Recent activity
-Monthly or weekly trends
-The purpose here is to show how you design backend endpoints or service logic for aggregated data, not just basic CRUD operations.
+### 2. `Role` Model
 
-4. Access Control Logic
-   Implement backend level access control for different roles.
+Governs standard Role-Based Access Control logic (RBAC).
 
-The system should clearly enforce which type of user can perform which action. For example:
+- `id`: UUID (Primary Key)
+- `name`: String (Unique) - (`ADMIN`, `ANALYST`, `VIEWER`)
+- `description`: String?
 
-A viewer should not be able to create or modify records
-An analyst may be allowed to read records and access summaries
-An admin may be allowed full management access
-You may implement this using middleware, guards, decorators, policy checks, or any equivalent method depending on the framework you choose.
+### 3. `Category` Model
 
-5. Validation and Error Handling
-   Your backend should demonstrate proper handling of incorrect or incomplete input.
+Standardizes transactional tagging enforcing types logic.
 
-This includes:
+- `id`: UUID (Primary Key)
+- `name`: String (e.g., "Food", "Salary")
+- `type`: Enum (`INCOME` | `EXPENSE`)
 
-Input validation
-Useful error responses
-Status codes used appropriately
-Protection against invalid operations
-The goal is not perfection, but your implementation should show that you understand how a backend should behave in real usage.
+### 4. `FinancialRecord` Model
 
-6. Data Persistence
-   Use a persistence approach suitable for your project.
+The core ledger entity mapping the financial logs.
 
-This can be:
+- `id`: UUID (Primary Key)
+- `amount`: Float
+- `type`: Enum (`INCOME` | `EXPENSE`)
+- `date`: DateTime
+- `notes`: String?
+- `userId`: Foreign Key linking to `User` (The initiator)
+- `categoryId`: Foreign Key linking to `Category`
+- _Timestamps_: `createdAt`, `updatedAt`
 
-A relational database
-A document database
-SQLite for simplicity
-Any other reasonable option
-If you choose a simplified or mock storage approach, mention it clearly in your documentation.
+---
 
-Optional Enhancements
-You may include additional improvements such as:
+## System Architecture
 
-Authentication using tokens or sessions
-Pagination for record listing
-Search support
-Soft delete functionality
-Rate limiting
-Unit tests or integration tests
-API documentation
-These are not mandatory, but thoughtful additions are always appreciated.
+The codebase cleanly decouples concerns using a modern layered configuration.
 
-Evaluation Criteria
+- **`/routes`**: Intercepts HTTP Requests, runs the designated pre-flight middleware matrices, and bridges incoming streams into controllers.
+- **`/controllers`**: HTTP logic layer. Translates REST payload bodies natively and formats standard HTTP Status Codes (e.g., 201 Created vs 403 Forbidden).
+- **`/services`**: Houses pure business logic and acts as the bridging link to the database. It is framework agnostic.
+- **`/middleware`**: Extracts and validates JWT claims via `authenticate.js` and securely blocks endpoints natively through an `authorize.js` explicit array filter loop.
+- **`/validators`**: Applies `Zod` schemas pre-flight to capture malformed JSON definitions safely before server execution.
+- **`/db`**: Stores the absolute singleton `prisma.js` connector ensuring the server relies on a single persistent memory pool mapping to the database to mitigate leaks.
 
-1. Backend Design
-   How well the application is structured, including routes, services, models, and separation of concerns.
+---
 
-2. Logical Thinking
-   How clearly business rules, access control, and data processing have been implemented.
+## API Endpoints Overview
 
-3. Functionality
-   Whether the expected APIs and backend features work correctly and consistently.
+The endpoints are separated across unique modular routers.
 
-4. Code Quality
-   Readability, maintainability, naming, organization, and general coding practices.
+### Auth Operations
 
-5. Database and Data Modeling
-   How appropriately data is modeled and managed for the use case.
+- `POST /auth/register` - Instantiate a new account natively (defaults to `VIEWER`).
+- `POST /auth/login` - Request a signed JWT.
 
-6. Validation and Reliability
-   How well the application handles bad input, invalid states, and error conditions.
+### Admin Operations
 
-7. Documentation
-   Clarity of the README, setup process, API explanation, assumptions made, and any tradeoffs considered.
+_(Restricted to `ADMIN`)_
 
-8. Additional Thoughtfulness
-   Any extra effort that improves usability, clarity, or system design.
+- `POST /admin/user` - Create elevated users directly.
+- `GET /admin/user` - Retrieve total user logs.
+- `DELETE /admin/user/:id` - Delete existing users safely.
+- `PATCH /admin/user/:id/status` - Suspend or activate a specific user dynamically.
+
+### Record Operations
+
+_(Restricted to `ADMIN`, `ANALYST` with localized access drops)_
+
+- `POST /record/create` - Append a ledger entity.
+- `GET /record/get` - Fetch ledger records including relation objects (`Category`).
+- `PATCH /record/:id` - Perform a partial schema update.
+- `DELETE /record/:id` - Perform strict deletions.
+
+### Category Operations
+
+_(Restricted appropriately to prevent data poisoning)_
+
+- `POST /category` - Deploy a schema classification.
+- `GET /category` - Find existing schema classifications.
+- `DELETE /category/:id` - Erase classifications explicitly.
+
+### Dashboard Core
+
+- `GET /dashboard/summary` - Aggregate total expenses, income, net balances, category aggregates (`categoryId`), and limit logs natively on the DB level implicitly resolving logic depending on whether an `ADMIN` or regular User queried it.
+
+---
+
+## Security & Authentication
+
+1. **JSON Web Tokens (JWT)**: Upon login, an expiry-bound signature is embedded wrapping the specific user constraints map (ID, and Role string). This token maps against `authorization: Bearer <token>` Headers globally.
+2. **Password Encryption**: Utilizing salted constraints over 10 rounds using standard `bcryptjs`.
+3. **Route Guards**: Critical routes wrap arrays like `authorizeRoles([ROLES.ADMIN, ROLES.ANALYST])` rendering illegal requests utterly dead natively upon hitting routing configuration layers avoiding potential DB hits dynamically.
+4. **Validation Isolation**: Schemas wrap strict structures via `Zod` ensuring random parameters drop gracefully.
+
+---
+
+## Local Environment Setup
+
+1. **Install Node Utilities**:
+
+   ```bash
+   npm install
+   ```
+
+2. **Configure Variables**: Create `.env` inside the root matching your credentials hook.
+
+   ```
+   DATABASE_URL="postgresql://user:pass@localhost:5432/finance_db"
+   JWT_SECRET="YOUR_RANDOM_SECRET"
+   PORT=3000
+   ```
+
+3. **Deploy the Database**: Using standard Prisma deployment mechanics.
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+4. **Initiate Core Execution**:
+   ```bash
+   npm start
+   # or node index.js
+   ```
+   _(Note: Attempting to boot `index.js` naturally executes `seedAdmin()` asynchronously in the background. It will automatically populate your Database with the 3 Role schemas and an initial `admin@admin.com` `123456` user log guaranteeing instantaneous access)._
+
+---
+
+## Design Decisions & Trade-offs
+
+- **Zod for Validation**: Picked inherently for high developer speed and clean syntactic strict mapping.
+- **Unified Prisma Singleton**: The DB hook isn't randomly opened per service script avoiding "too many connections" timeouts. It runs via `/db/prisma.js`.
+- **Soft Deletes vs Status Patches**: Users themselves aren't soft deleted but heavily gated by their `ACTIVE / INACTIVE` enums allowing them to stay suspended explicitly gracefully inside relational maps across `FinancialRecord` logs without exploding the constraints.
