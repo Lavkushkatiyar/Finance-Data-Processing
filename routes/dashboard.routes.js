@@ -7,9 +7,9 @@ const { getDashBoardSummary } = require("../controllers/dashboard.controller");
 const router = express.Router();
 
 router.get(
-  "/dashboard/summary",
+  "/summary",
   authenticate,
-  authorizeRoles([ROLES.ADMIN, ROLES.ANALYST]),
+  authorizeRoles([ROLES.ADMIN, ROLES.ANALYST, ROLES.USER]),
   getDashBoardSummary,
 );
 module.exports = router;

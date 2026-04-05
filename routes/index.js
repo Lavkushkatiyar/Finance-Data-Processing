@@ -12,5 +12,5 @@ router.use("/user", userRoutes);
 router.use("/record", recordRoutes);
 
 router.use("/admin", adminRoutes);
-router.use("/api", dashboardRoutes);
+router.use("/dashboard", dashboardRoutes);
 module.exports = router;
