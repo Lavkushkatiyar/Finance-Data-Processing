@@ -3,7 +3,7 @@ const {
   registerHandler,
   loginHandler,
 } = require("../controllers/auth_controller");
-const validate = require("../middleware/validate");
+const { validate } = require("../middleware/validate");
 const { registerSchema, loginSchema } = require("../validators/auth_schema");
 
 const router = express.Router();

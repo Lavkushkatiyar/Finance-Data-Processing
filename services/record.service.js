@@ -1,27 +1,13 @@
-const { prisma } = require("../utils.js")
+const { prisma } = require("../utils.js");
 
 const createRecordService = async (userId, data) => {
-  const user = await prisma.user.findUnique({ where: { id: userId } })
-
-  if(!user) throw new Error("User not found")
-
-  const isValid = user.role === "ADMIN" || user.role === "ANALYST"
-
-  if (!isValid) throw new Error("Not allowed to create this record")
-
-  const { amount, type, categoryId, date, notes } = data
-
-  if (!amount || amount <= 0) throw new Error("Invalid amount")
-
-  if (!["INCOME", "EXPENSE"].includes(type)) throw new Error("Invalid type")
-
-  if (!categoryId) throw new Error("categoryId is required")
+  const { amount, type, categoryId, date, notes } = data;
 
   const category = await prisma.category.findUnique({
-    where: { id: categoryId }
-  })
+    where: { id: categoryId },
+  });
 
-  if (!category) throw new Error("Invalid categoryId")
+  if (!category) throw new Error("Invalid categoryId");
 
   const record = await prisma.financialRecord.create({
     data: {
@@ -30,59 +16,56 @@ const createRecordService = async (userId, data) => {
       categoryId,
       userId,
       date: date ? new Date(date) : new Date(),
-      notes
-    }
-  })
+      notes,
+    },
+  });
 
-  return record
-}
+  return record;
+};
 
 const getRecordsService = async (user, query) => {
-  const { type, categoryId, from, to } = query
-  
-  const filters = {}
-  if (user.role !== "ADMIN")  filters.userId = user.id
+  const { type, categoryId, from, to } = query;
 
-  if (type && ["INCOME", "EXPENSE"].includes(type)) {
-    filters.type = type
-  }
+  const filters = {};
 
-  if (categoryId) filters.categoryId = categoryId
+  if (user.role !== "ADMIN") filters.userId = user.id;
 
-  if (from || to) filters.date = {}
+  if (type) filters.type = type;
 
-  if (from)  filters.date.gte = new Date(from)
-  
+  if (categoryId) filters.categoryId = categoryId;
 
-  if (to) filters.date.lte = new Date(to)
+  if (from || to) filters.date = {};
+
+  if (from) filters.date.gte = new Date(from);
+
+  if (to) filters.date.lte = new Date(to);
 
   const records = await prisma.financialRecord.findMany({
     where: filters,
     include: {
-      Category: true
+      Category: true,
     },
     orderBy: {
-      date: "desc"
-    }
-  })
-  return records
-}
+      date: "desc",
+    },
+  });
 
+  return records;
+};
 
 const updateRecordService = async (recordId, user, data) => {
   const existing = await prisma.financialRecord.findUnique({
-    where: { id: recordId }
-  })
+    where: { id: recordId },
+  });
 
-  if (!existing) throw new Error("Record not found")
+  if (!existing) throw new Error("Record not found");
 
-  const isOwner = existing.userId === user.id
-  const isAdmin = user.role === "ADMIN"
+  const isOwner = existing.userId === user.id;
+  const isAdmin = user.role === "ADMIN";
 
   if (!isOwner && !isAdmin) {
-    throw new Error("Not allowed to update this record")
+    throw new Error("Not allowed to update this record");
   }
-
 
   const updated = await prisma.financialRecord.update({
     where: { id: recordId },
@@ -91,28 +74,35 @@ const updateRecordService = async (recordId, user, data) => {
       type: data.type ?? existing.type,
       categoryId: data.categoryId ?? existing.categoryId,
       date: data.date ? new Date(data.date) : existing.date,
-      notes: data.notes ?? existing.notes
-    }
-  })
+      notes: data.notes ?? existing.notes,
+    },
+  });
 
-  return updated
-}
+  return updated;
+};
 
+const deleteRecordService = async (recordId, user) => {
+  const existing = await prisma.financialRecord.findUnique({
+    where: { id: recordId },
+  });
 
-const deleteRecordService = async(recordId,user)=> {
-  const existing =  await prisma.financialRecord.findUnique({
-    where :{id:recordId}
-  })
-  if(!existing) throw new Error("doesn't exist record")
-    const isOwner = existing.userId === user.id;
-  const isAdmin = user.role ==="ADMIN";
+  if (!existing) throw new Error("Record not found");
 
-  if(!isOwner && !isAdmin) throw new Error("Not allowed to delete this record")
+  const isOwner = existing.userId === user.id;
+  const isAdmin = user.role === "ADMIN";
 
-    await prisma.financialRecord.delete({
-      where :{id:recordId}
-    })
- 
-}
+  if (!isOwner && !isAdmin) {
+    throw new Error("Not allowed to delete this record");
+  }
 
-module.exports = { createRecordService, getRecordsService ,updateRecordService ,deleteRecordService}
+  await prisma.financialRecord.delete({
+    where: { id: recordId },
+  });
+};
+
+module.exports = {
+  createRecordService,
+  getRecordsService,
+  updateRecordService,
+  deleteRecordService,
+};
