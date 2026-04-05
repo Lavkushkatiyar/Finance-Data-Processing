@@ -14,7 +14,9 @@
   "description": "Finance Data Processing and Access Control Backend\r Objective\r To evaluate your backend development skills through a practical assignment centered around API design, data modeling, business logic, and access control.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
