@@ -1,6 +1,7 @@
 const {
   getUserService,
   deleteUserService,
+  updateUserStatusService,
 } = require("../services/adminService");
 const { addNewUser } = require("../utils");
 
@@ -55,8 +56,26 @@ const deleteUserController = async (req, res) => {
   }
 };
 
+const updateUserStatusController = async (req, res) => {
+  const { id } = req.validatedParams;
+  const { status } = req.validatedBody;
+
+  try {
+    const updatedUser = await updateUserStatusService(id, status);
+
+    return res.status(200).json({
+      data: updatedUser,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createUserController,
   getUserController,
   deleteUserController,
+  updateUserStatusController,
 };

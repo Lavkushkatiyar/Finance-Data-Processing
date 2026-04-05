@@ -16,4 +16,17 @@ const deleteUserService = async (userId) => {
   });
   return user;
 };
-module.exports = { getUserService, deleteUserService };
+const updateUserStatusService = async (userId, status) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) throw new Error("user doesn't exist");
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: { status }
+  });
+  return updatedUser;
+};
+
+module.exports = { getUserService, deleteUserService, updateUserStatusService };

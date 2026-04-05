@@ -9,7 +9,7 @@ const router = express.Router();
 router.get(
   "/summary",
   authenticate,
-  authorizeRoles([ROLES.ADMIN, ROLES.ANALYST, ROLES.USER]),
+  authorizeRoles([ROLES.ADMIN, ROLES.ANALYST, ROLES.VIEWER]),
   getDashBoardSummary,
 );
 module.exports = router;

@@ -15,7 +15,14 @@ const userIdParamSchema = z
   })
   .strict();
 
+const updateUserStatusSchema = z
+  .object({
+    status: z.enum(["ACTIVE", "INACTIVE"]),
+  })
+  .strict();
+
 module.exports = {
   createUserSchema,
   userIdParamSchema,
+  updateUserStatusSchema,
 };

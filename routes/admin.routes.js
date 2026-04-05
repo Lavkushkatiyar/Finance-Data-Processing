@@ -8,12 +8,14 @@ const { validate, validateParams } = require("../middleware/validate");
 const {
   createUserSchema,
   userIdParamSchema,
+  updateUserStatusSchema,
 } = require("../validators/admin.schema");
 
 const {
   createUserController,
   getUserController,
   deleteUserController,
+  updateUserStatusController,
 } = require("../controllers/admin.controller");
 
 const router = express.Router();
@@ -39,6 +41,15 @@ router.delete(
   authorizeRoles([ROLES.ADMIN]),
   validateParams(userIdParamSchema),
   deleteUserController,
+);
+
+router.patch(
+  "/user/:id/status",
+  authenticate,
+  authorizeRoles([ROLES.ADMIN]),
+  validateParams(userIdParamSchema),
+  validate(updateUserStatusSchema),
+  updateUserStatusController,
 );
 
 module.exports = router;

@@ -9,7 +9,7 @@ const authenticate = async (req, res, next) => {
     return res.status(401).json({ error: "Authorization header missing" })
   }
 
-  const token = authHeader.startsWith("Bearer")
+  const token = authHeader.startsWith("Bearer ")
     ? authHeader.split(" ")[1]
     : null
 

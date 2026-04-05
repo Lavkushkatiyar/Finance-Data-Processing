@@ -3,6 +3,7 @@ const authRoutes = require("./auth.routes");
 const userRoutes = require("./user.routes");
 const recordRoutes = require("./record.routes");
 const adminRoutes = require("./admin.routes");
+const categoryRoutes = require("./category.routes");
 const router = express.Router();
 
 const dashboardRoutes = require("./dashboard.routes");
@@ -10,6 +11,7 @@ const dashboardRoutes = require("./dashboard.routes");
 router.use("/auth", authRoutes);
 router.use("/user", userRoutes);
 router.use("/record", recordRoutes);
+router.use("/category", categoryRoutes);
 
 router.use("/admin", adminRoutes);
 router.use("/dashboard", dashboardRoutes);
