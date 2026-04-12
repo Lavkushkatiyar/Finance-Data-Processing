@@ -3,6 +3,9 @@
 A robust, logically structured RESTful API configured to operate as a finance dashboard system backend. This application is capable of user role management, category administration, financial record tracking, and dashboard analytics computing.
 
 ---
+## 🚀 Live API
+
+https://finance-data-processing-z9vw.onrender.com/
 
 ## Table of Contents
 
