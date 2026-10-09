@@ -4,6 +4,14 @@ const routes = require("./routes");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.get("/health", (req, res) => {
+  res.json({
+    message: "Backend is live",
+    status: "Backend is live",
+  });
+})
+
 app.get("/", (req, res) => {
   res.json({
     message: "Welcome to the Finance Data Processing API!",
