@@ -5,7 +5,7 @@ A robust, logically structured RESTful API configured to operate as a finance da
 ---
 ## 🚀 Live API
 
-https://finance-data-processing-z9vw.onrender.com/
+financedata.velixir.run
 
 ## Table of Contents
 
